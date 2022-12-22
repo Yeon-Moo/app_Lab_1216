@@ -11,6 +11,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     private static final int version=1;
 
     public MyDBHelper(@Nullable Context context){
+
         super(context,name,null,version);
     }
     @Override
@@ -21,5 +22,6 @@ public class MyDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE　IF EXISTS myTABLE");
+        onCreate(db);
     }
 }

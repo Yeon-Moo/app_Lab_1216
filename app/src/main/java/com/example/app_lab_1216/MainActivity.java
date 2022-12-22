@@ -1,10 +1,13 @@
 package com.example.app_lab_1216;
 
+import static android.R.layout.simple_list_item_1;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_quary,btn_insert,btn_update,btn_delete;
     private ListView listView;
     private ArrayAdapter<String> adapter;
-    private ArrayAdapter<String> items=new ArrayList<>();
+    private ArrayList<String> items=new ArrayList<>();
     private SQLiteDatabase dbrw;
 
 
@@ -41,31 +44,34 @@ public class MainActivity extends AppCompatActivity {
         btn_delete=findViewById(R.id.btn_delete);
         btn_insert=findViewById(R.id.btn_insert);
         listView=findViewById(R.id.listView);
-        adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,items);
+        adapter=new ArrayAdapter<>(this, simple_list_item_1,items);
         listView.setAdapter(adapter);
         dbrw=new MyDBHelper(this).getWritableDatabase();
-        btn_insert.setOnClickListener(view->{
-            if(ed_book.length()<1||ed_price.length()<1)
-                Toast.makeText(MainActivity.this,"成功書名"+ed_book.getText().toString()+
-                        "   價格"+ed_price.getText().toString(),Toast.LENGTH_SHORT).show();
-            else{
-                try{
-                    dbrw.execSQL("INSERT INTO myTable(book,price) VALUES(?,?)",new Object[]{
-                            ed_book.getText().toString(),ed_price.getText().toString()});
+        btn_insert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(ed_book.length()<1||ed_price.length()<1)
                     Toast.makeText(MainActivity.this,"成功書名"+ed_book.getText().toString()+
-                            " 價格"+ed_price.getText().toString(),Toast.LENGTH_SHORT).show();
-                    ed_book.setText("");
-                    ed_price.setText("");
+                            "   價格"+ed_price.getText().toString(),Toast.LENGTH_SHORT).show();
+                else{
+                    try{
+                        dbrw.execSQL("INSERT INTO myTable(book,price) VALUES(?,?)",new Object[]{
+                                ed_book.getText().toString(),ed_price.getText().toString()});
+                        Toast.makeText(MainActivity.this,"成功書名"+ed_book.getText().toString()+
+                                " 價格"+ed_price.getText().toString(),Toast.LENGTH_SHORT).show();
+                        ed_book.setText("");
+                        ed_price.setText("");
                     }catch (Exception e){
-                    e.printStackTrace();
-                    Toast.makeText(MainActivity.this,"新增失敗:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this,"新增失敗:"+e.getMessage(),Toast.LENGTH_SHORT).show();
 
+                    }
                 }
             }
         });
 
 
-        btn_update.setOnClickListener(view->{
+        btn_update.setOnClickListener(view -> {
             if(ed_book.length()<1||ed_price.length()<1)
                 Toast.makeText(MainActivity.this,"欄位請勿留空",Toast.LENGTH_SHORT).show();
             else{
@@ -85,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        btn_delete.setOnClickListener(view->{
+        btn_delete.setOnClickListener(view -> {
             if(ed_book.length()<1)
                 Toast.makeText(MainActivity.this,"書名請勿留空",Toast.LENGTH_SHORT).show();
             else{
@@ -101,25 +107,29 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
+
         });
-        btn_quary.setOnClickListener(view->{
+        btn_quary.setOnClickListener(view -> {
             Cursor c;
             if(ed_book.length()<1)
-               c= dbrw.rawQuery("SELECT * FROM myTable",null);
+                c= dbrw.rawQuery("SELECT * FROM myTable",null);
             else{
-                c=dbrw.rawQuery("SELECT * FROM myTable WHERE book LIKE '"+ed_book.getText().toString()+"'",null);
+                c=dbrw.rawQuery("SELECT * FROM myTable WHERE book LIKE '"+
+                        ed_book.getText().toString()+"'",null);
 
             }
             c.moveToFirst();
             items.clear();
             Toast.makeText(MainActivity.this,"共有"+c.getCount()+"筆",Toast.LENGTH_SHORT).show();
             for(int i=0;i<c.getCount();i++){
-                items.add("書籍"+c.getString(0)+"\t\t\t\\t價格"+c.toString());
+
+                items.add("書籍"+c.getString(0)+"價格"+c.getString(1));
                 c.moveToNext();
             }
             adapter.notifyDataSetChanged();
             c.close();
         });
+
 
     }
 }
