@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private EditText ed_book,ed_price;
 
-    private Button btn_quary,btn_insert,btn_update,btn_delete;
+    private Button btn_query,btn_insert,btn_update,btn_delete;
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> items=new ArrayList<>();
@@ -39,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
 
         ed_book=findViewById(R.id.ed_book);
         ed_price=findViewById(R.id.ed_price);
-        btn_quary=findViewById(R.id.btn_query);
+        btn_query=findViewById(R.id.btn_query);
         btn_update=findViewById(R.id.btn_update);
         btn_delete=findViewById(R.id.btn_delete);
         btn_insert=findViewById(R.id.btn_insert);
         listView=findViewById(R.id.listView);
-        adapter=new ArrayAdapter<>(this, simple_list_item_1,items);
+
+        adapter=new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,items);
         listView.setAdapter(adapter);
         dbrw=new MyDBHelper(this).getWritableDatabase();
         btn_insert.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 try{
                     dbrw.execSQL("UPDATE myTable SET price="+
                             ed_price.getText().toString()+
-                            "WHERE book LIKE'"+
+                            " WHERE book LIKE '"+
                             ed_book.getText().toString()+"'");
                     Toast.makeText(MainActivity.this,"更新書名"+ed_book.getText().toString()+
                             " 價格"+ed_price.getText().toString(),Toast.LENGTH_SHORT).show();
@@ -109,10 +110,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        btn_quary.setOnClickListener(view -> {
+        btn_query.setOnClickListener(view -> {
             Cursor c;
-            if(ed_book.length()<1)
+            if(ed_book.length()<1){
                 c= dbrw.rawQuery("SELECT * FROM myTable",null);
+            }
             else{
                 c=dbrw.rawQuery("SELECT * FROM myTable WHERE book LIKE '"+
                         ed_book.getText().toString()+"'",null);
@@ -126,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 items.add("書籍"+c.getString(0)+"價格"+c.getString(1));
                 c.moveToNext();
             }
+            System.out.println(items);
             adapter.notifyDataSetChanged();
             c.close();
         });
